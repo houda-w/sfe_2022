@@ -1,0 +1,13 @@
+.stButton>button {
+    background: rgb(172, 157, 157);
+    height: 1cm;
+    width: 20cm;
+    
+}
+
+button:hover {background-color:  white} 
+
+img{
+    float: right;
+    width: 25%;
+}

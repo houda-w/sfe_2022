@@ -1,0 +1,216 @@
+ st.write('Impression des pdf')
+  if st.button("page d'acceuil"):
+     st.session_state.runpage = main_page
+     st.experimental_rerun()
+
+if 'runpage' not in st.session_state:
+   st.session_state.runpage = main_page
+   st.session_state.runpage()
+
+
+
+pdf = FPDF()
+pdf.add_page()
+pdf.set_font('Arial', 'B', 16)
+pdf.cell(40, 10, 'Hello World!')
+pdf.output('tuto1.pdf', 'F')
+
+with options:
+     st.caption('veuillez choisir une des options suivantes')
+     button1 =st.button('impression')
+     st.button('consulter BD de selection')
+     st.button('Analytics')
+
+
+if button1:
+    st.session_state.runpage = print.app()
+    st.session_state.runpage()
+    st.experimental_rerun()
+
+
+PAGES = {
+   "Impression" : print
+}
+
+selection = st.sidebar.radio("Go to", list(PAGES.keys()))
+page = PAGES[selection]
+page.app()     
+
+ datafile = st.file_uploader("Upload xlsx",type="xlsx")
+    df  = pd.read_excel(datafile)
+    st.dataframe(df)
+    st.write(df)
+
+
+
+for nomElv in unique_elv_list:
+    #Import template document
+    template = DocxTemplate('pv_template2.docx') 
+    current_elv = sheet.cell(row = cell_row, column = 4).value
+    for cell_row in range( 2, max_row+1):
+        if nomElv == current_elv:
+            #print('cool')
+            ind = [i for i, x in enumerate(elv_list) if x == current_elv]
+            #print(ind)
+            for i in index_elv:
+                if ind == i:
+                    #print(i)
+                    for e in ind :
+                        #print(e)
+                        val = race_list[e]           
+                #print('hello')
+                continue
+            
+            temp_elv.append(val)   
+        continue   
+
+         
+
+    table_contents.append(
+    {
+    "RACE": temp_elv,
+    }
+    )    
+
+    context = {
+    'table_contents': table_contents
+    }   
+
+            
+
+connection = mysql.connector.connect(host='localhost',
+                                    database='test',
+                                    user='root'
+                                    )
+
+def add_data(nom,fich):
+	c.execute("INSERT INTO mytable(id,nom_elv,doc_pdf) VALUES (nextval('item_number_pk'),?,?)",(nom,fich))
+	conn.commit()
+
+# Convert digital data to binary format
+def convertToBinaryData(filename):
+    with open(filename, 'rb') as file:
+        binaryData = file.read()
+    return binaryData
+
+#inserts BLOB files in database
+def insertBLOB(nom,biodataFile):
+    print("Inserting BLOB into python_employee table")
+    try:
+        connection = mysql.connector.connect(host='localhost',
+                                             database='test',
+                                             user='root',
+                                             password='')
+
+        cursor = connection.cursor()
+        sql_insert_blob_query = """ INSERT INTO pdf_table
+                          (nom_elv, doc_pdf) VALUES (%s,%s)"""
+
+        PvFile = convertToBinaryData(biodataFile)
+        #file = convertToBinaryData(biodataFile)
+
+        # Convert data into tuple format
+        insert_blob_tuple = (nom,PvFile)
+        result = cursor.execute(sql_insert_blob_query, insert_blob_tuple)
+        connection.commit()
+        print("File inserted successfully as a BLOB into python_employee table", result)
+
+    except mysql.connector.Error as error:
+        print("Failed inserting BLOB data into MySQL table {}".format(error))
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+            print("MySQL connection is closed")
+
+#Fetch binary file from sql DB and save it 
+def write_file(data, filename):
+    with open(filename, 'wb') as f:
+        f.write(data)
+def fetch_bin():
+    sampleNum = 0;
+    db_config = mysql.connector.connect(user='root', password='', host='localhost',database='test')
+    cursor = db_config.cursor()
+    try:
+        sampleNum=sampleNum+1;
+        query = "SELECT dpc_pdf FROM pdf_table WHERE id=%s"
+        cursor.execute(query,(sampleNum,))
+        file = cursor.fetchone()[0]
+        write_file(file, 'User'+str(sampleNum)+'.docx')
+    except AttributeError as e:
+        print(e)
+    finally:
+        cursor.close()
+
+
+    html_temp = """
+    <div style="background-color:#B4E197;padding:10px;border-radius:10px">
+    <h2 style="color:{};font-family:American Typewriter;text-align:left;font-size:25px">Office Régional de la mise en valeur agricole </h2>
+    </div>
+    """   
+   
+
+    row4_spacer1, row4_1, row4_spacer2 = st.columns((.2, 7.1, .2))
+    with row4_1:
+       st.subheader('Analysis per Team')  
+    row5_spacer1, row5_1, row5_spacer2, row5_2, row5_spacer3  = st.columns((.2, 2.3, .4, 4.4, .2))
+    with row5_1:  
+        observations_select = st.multiselect('selecionner les observations désirées:',ListObs)
+    with row5_2:
+        #plot_x_per_observ(plot_x_per_observ_selected)7
+        st.header("You selected: {}".format(", ".join(observations_select)))
+        dfs = {obs: obs == obs for obs in observations_select}
+        sns.countplot(x=dfs ,hue=zone, color='goldenrod', ax=ax)
+        ax.set_xlabel('Observations')
+        ax.set_ylabel('Zones')
+        ax.set(yticks=np.arange(1,50,2))
+        ax.set_xticks(range(1,30))
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+        st.pyplot(fig)
+        st.write('graph goes here')
+
+
+
+  an = st.button('afficher les graphes')
+    #rs = df.groupby(['Zone'])['Race'].count()
+    #print(rs)
+    uniqueRace = race.unique()
+    ListObs = obs.unique().tolist()
+    #options =list(range(len(uniqueObs)))
+    #print(uniqueRace)
+    fig1 = Figure(figsize=(16,8))
+    ax1 = fig1.subplots()
+    if an :
+        sns.pairplot(df, vars= df.columns[[df.columns.isin(['Nom UP','ZONE','OBSERVATION'])]],hue='ZONE')
+        plt.show()
+        #ob_zo = st.checkbox('Observations par zone')
+        #sns.countplot(x=obs,hue=zone, color='goldenrod', ax=ax)
+        #ax.set_xlabel('Observations')
+        #ax.set_ylabel('Zones')
+        #ax.set(yticks=np.arange(1,60,2))
+        #ax.set_xticks(range(1,50))
+        #ax.set_xticklabels(ax.get_xticklabels(), rotation=40, ha="right")
+        
+
+    generate_pie = st.button('generate pie')
+    if generate_pie:
+        fig2 = Figure(figsize=(10,6))
+        ax2 = fig2.subplots()
+        count  =  df['OBSERVATION'].value_counts()
+        ax2.pie(count, labels=ListObs, autopct='%1.1f%%',shadow=True, startangle=90, radius=1800)    
+        ax2.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        st.pyplot(fig2)
+
+        ax2.legend(loc='upper left', prop={'size': 11},bbox_to_anchor=(0.0, 1),bbox_transform=fig1.transFigure)
+
+
+        #values = st.selectbox('race',options,format_func=lambda x: uniqueRace[x],key='select_race')
+        #st.write(values)
+
+
+
+    #---- plot graphs ------#
+    inp = st.selectbox('Quel Observation voulez-vouz visualiser?',ListObs)
+    fig1 = px.histogram(df, x=ListZone, y=obs_zone[inp])
+    st.plotly_chart(fig1, use_container_width=True)
